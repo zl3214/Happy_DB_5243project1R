@@ -1,0 +1,237 @@
+title: "Sentiment Analysis on Happy Moments"
+author: "Your Name"
+output: html_document
+---
+
+## Introduction
+
+This analysis aims to explore the HappyDB dataset to understand what makes people happy. We will focus on the most frequently used words to express happiness among different genders.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidytext)
+library(DT)
+library(wordcloud2)
+library(scales)
+library(wordcloud2)
+library(gridExtra)
+library(ngram)
+library(shiny) 
+
+
+# call function lib
+source("lib/analysis_functions.R")
+```
+
+```{r load data, warning=FALSE, message=FALSE}
+hm_data <- read_csv("/Users/lizan/Documents/GitHub/52243project1R/output/processed_moments.csv")
+
+urlfile<-'https://raw.githubusercontent.com/rit-public/HappyDB/master/happydb/data/demographic.csv'
+demo_data <- read_csv(urlfile)
+```
+
+```{r combining data, warning=FALSE, message=FALSE}
+# Combine both the data sets and keep the required columns for analysis
+hm_data <- hm_data %>%
+  inner_join(demo_data, by = "wid") %>%
+  select(wid,
+         original_hm,
+         gender, 
+         marital, 
+         parenthood,
+         reflection_period,
+         age, 
+         country, 
+         ground_truth_category, 
+         text) %>%
+  mutate(count = sapply(hm_data$text, wordcount)) %>%
+  filter(gender %in% c("m", "f")) %>%
+  filter(marital %in% c("single", "married")) %>%
+  filter(parenthood %in% c("n", "y")) %>%
+  filter(reflection_period %in% c("24h", "3m")) %>%
+  mutate(reflection_period = fct_recode(reflection_period, 
+                                        months_3 = "3m", hours_24 = "24h"))
+```
+
+
+### calculate word count using function
+
+
+```{r setup, include=FALSE}
+my_word_count <- calculate_word_count(hm_data, "text")
+
+
+```
+
+
+# Create a bag of words using the text data
+
+```{r combining data, warning=FALSE, message=FALSE}
+bag_of_words <-  hm_data %>%
+  unnest_tokens(word, text)
+
+word_count <- bag_of_words %>%
+  count(gender, word, sort = TRUE)
+```
+
+
+# visulize the result
+```{r combining data, warning=FALSE, message=FALSE}
+# Filter top 10 most frequent words for each gender
+top_words <- word_count %>%
+  group_by(gender) %>%
+  top_n(10, wt = n)
+
+# Visualize the result
+ggplot(top_words, aes(x = reorder(word, n), y = n, fill = gender)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Most Frequently Used Words to Express Happiness Among Different Genders",
+       x = "Words",
+       y = "Frequency") +
+  facet_wrap(~gender)
+
+
+# Create separate data frames for each gender
+male_words <- filter(top_words, gender == "m")
+female_words <- filter(top_words, gender == "f")
+
+```
+
+```{r}
+library(tidytext)
+
+head(sentiments)
+
+
+```
+
+
+### Sentiment Score by Gender
+
+use the `bing` lexicon to calculate the sentiment score for each word and then aggregate them by gender.
+
+```{r sentiment-score}
+# Load the tidytext package
+library(tidytext)
+
+# Calculate sentiment score
+sentiment_score <- bag_of_words %>%
+  inner_join(sentiments, by = "word") %>%
+  count(gender, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment_score = positive - negative)
+
+# Visualize the sentiment score by gender
+ggplot(sentiment_score, aes(x = gender, y = sentiment_score, fill = gender)) +
+  geom_col() +
+  labs(title = "Sentiment Score by Gender",
+       x = "Gender",
+       y = "Sentiment Score")
+```
+
+
+```{r}
+
+library(igraph)
+library(ggraph)
+library(tidyr)  
+
+# Create bigrams
+bigrams <- hm_data %>%
+  unnest_tokens(bigram, text, token = "ngrams", n = 2)
+
+# Count and filter to get top 50 bigrams
+bigram_count <- bigrams %>%
+  count(bigram, sort = TRUE) %>%
+  head(100)
+
+# Remove rows where bigram is NA
+bigram_count <- bigram_count %>%
+  drop_na(bigram)
+
+# Create a network graph
+bigram_network <- bigram_count %>%
+  separate(bigram, c("word1", "word2"), sep = " ", remove = FALSE) %>%
+  drop_na(word1, word2) %>%
+  graph_from_data_frame()
+
+# Visualize the network
+ggraph(bigram_network, layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE) +
+  geom_node_point(color = "blue", size = 5) +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+  theme_void()
+```
+
+
+```{r}
+# 首先确保hm_data和bag_of_words都有一个共同的列（例如，'wid'）用于连接。
+# 然后执行内连接。
+combined_data <- inner_join(bag_of_words, hm_data, by = "wid")
+```
+
+```{r}
+# 查看combined_data的列
+colnames(combined_data)
+
+```
+
+
+```{r}
+# 重命名列以去除.x和.y后缀
+combined_data <- combined_data %>%
+  rename(
+    gender = gender.x,
+    marital = marital.x
+  )
+
+# 现在，我们可以按性别和婚姻状况对单词进行计数。
+word_count_gender_marital <- combined_data %>%
+  count(gender, marital, word, sort = TRUE) %>%
+  group_by(gender, marital) %>%
+  top_n(5, wt = n)
+
+# 可视化结果
+ggplot(word_count_gender_marital, aes(x = reorder(word, n), y = n, fill = marital)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Top 5 Words Used to Express Happiness by Gender and Marital Status",
+       x = "Words",
+       y = "Frequency") +
+  facet_grid(marital ~ gender)
+
+
+```
+```{r}
+# 现在，我们可以按性别和婚姻状况对单词进行计数。
+word_count_gender_marital <- combined_data %>%
+  count(gender, marital, word, sort = TRUE) %>%
+  group_by(gender, marital) %>%
+  mutate(total = sum(n)) %>%
+  top_n(5, wt = n) %>%
+  ungroup() %>%
+  mutate(percentage = n / total * 100)
+
+# 可视化结果
+ggplot(word_count_gender_marital, aes(x = reorder(word, percentage), y = percentage, fill = marital)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Top 5 Words Used to Express Happiness by Gender and Marital Status",
+       x = "Words",
+       y = "Percentage (%)") +
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+```
+
+
+```{r}
+facet_grid(marital ~ gender)
