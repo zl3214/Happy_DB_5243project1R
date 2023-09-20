@@ -1,28 +1,38 @@
-# Applied Data Science @ Columbia
-## Fall 2023
-## Project 1: What made you happy today?
+Sentiment Analysis on Happy Moments: A Data Story
+---
+### Introduction
+Ever wondered what makes people tick? What makes them happy? In a world where data speaks louder than words, we've dived deep into the HappyDB dataset to explore the nuances of happiness. This analysis aims to shed light on the most frequently used words to express happiness among different genders and marital statuses.
 
-![image](figs/title.jpeg)
+### Data Source
+The data comes from the HappyDB dataset, a collection of 100,000 crowd-sourced happy moments. The dataset is rich with demographic information like gender, marital status, and age, making it a goldmine for anyone interested in the science of happiness.
 
-### [Project Description](doc/Proj1_desc.md)
-This is the first and only *individual* (as opposed to *team*) this semester. 
+### Data Preparation
+The data was pre-processed using a starter code, which helped in cleaning and structuring the dataset for analysis. The starter code was instrumental in filtering out irrelevant columns and focusing on the ones that matter: gender, marital status, and text describing the happy moment.
 
-Term: Fall 2023
+### Methodology
+Libraries Used
+tidyverse for data manipulation
+tidytext for text mining
+DT for rendering tables
+wordcloud2 for creating word clouds
+scales, gridExtra, ngram, and shiny for additional functionalities
+Data Exploration
 
-+ Projec title: Lorem ipsum dolor sit amet
-+ This project is conducted by [your name]
+##### Most Frequent Words by Gender: A bar chart was created to visualize the top 10 most frequently used words to express happiness among males and females.
 
-+ Project summary: [a short summary] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+##### Sentiment Score by Gender: Using the bing lexicon, the sentiment score for each word was calculated and then aggregated by gender.
 
-Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
+##### Bigram Network: A network graph was created to visualize the top 50 bigrams (two-word combinations) in the dataset.
 
-```
-proj/
-├── lib/
-├── data/
-├── doc/
-├── figs/
-└── output/
-```
+### Further Analysis
+The final part of the analysis delves into the relationship between marital status and the words used to express happiness. Four bar charts were created to display the top 5 words used by married and unmarried males and females.
 
-Please see each subfolder for a README file.
+### Insights
+Words like "love", "family", and "friends" are universally popular across genders and marital statuses.
+Unmarried individuals tend to use words like "free", "party", and "adventure" more frequently.
+Sentiment scores are generally positive, indicating that the dataset is indeed a collection of happy moments.
+Conclusion
+This analysis is more than just a data story; it's a glimpse into human emotion and the words we use to express it. Whether you're a data scientist, a linguist, or just someone interested in understanding happiness, this project offers a compelling narrative backed by data.
+
+# Feel free to dive into the code and explore the dataset yourself. Who knows, you might just find what makes you happy!
+
