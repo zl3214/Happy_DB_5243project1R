@@ -139,7 +139,10 @@ fig_1
 ggsave(filename = "figs/plot_1.png", plot = fig_1)
 ```
 
-![Plot 1 Description](figs/plot_1.png)
+```{r}
+knitr::include_graphics("figs/plot_1.png")
+
+```
 
 
 # 2. Network Graph of Bigrams
