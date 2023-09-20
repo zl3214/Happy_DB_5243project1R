@@ -137,8 +137,11 @@ fig_1
 ```{r}
 
 ggsave(filename = "figs/plot_1.png", plot = fig_1)
-
 ```
+
+![Plot 1 Description](figs/plot_1.png)
+
+
 # 2. Network Graph of Bigrams
 # create network graph to directly show witch pair of words are 
 2. Network Graph of Bigrams
