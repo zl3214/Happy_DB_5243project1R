@@ -84,7 +84,7 @@ top_words <- word_count %>%
   top_n(10, wt = n)
 
 # Visualize the result
-ggplot(top_words, aes(x = reorder(word, n), y = n, fill = gender)) +
+fig_0 = ggplot(top_words, aes(x = reorder(word, n), y = n, fill = gender)) +
   geom_col() +
   coord_flip() +
   labs(title = "Most Frequently Used Words to Express Happiness Among Different Genders",
@@ -98,6 +98,14 @@ male_words <- filter(top_words, gender == "m")
 female_words <- filter(top_words, gender == "f")
 
 ```
+
+```{r}
+ggsave(filename = "figs/plot_0.png", plot = fig_0)
+```
+
+The first chart reveals some fascinating gender differences in the words used to express happiness. Both men and women frequently use words like "friend," "day," and "time," but diverge when it comes to other terms. Men are more likely to use words like "played," "finally," and "wife," which could indicate a focus on leisure activities and marital relationships. Women, on the other hand, prefer words like "son," "daughter," and "husband," highlighting the importance of family in their expressions of happiness. This suggests that men might find happiness more in activities and achievements, while women find it in familial relationships.
+
+
 
 ```{r}
 library(tidytext)
@@ -139,6 +147,7 @@ fig_1
 ggsave(filename = "figs/plot_1.png", plot = fig_1)
 ```
 
+this plot shows that man have relatively higher sentiment score compared to woman
 
 
 
@@ -182,6 +191,11 @@ fig_2 = ggraph(bigram_network, layout = "fr") +
   theme_void()
 fig_2
 ```
+
+## High-Frequency Word Combinations
+The second chart shows that words like "friend," "day," "life," and "time" are often paired with other words, indicating their versatility in describing happy moments. These high-frequency combinations suggest that these terms are central to how people articulate joy, regardless of gender or marital status.
+
+
 
 ### export fig
 ```{r}
@@ -234,6 +248,7 @@ fig_3 =  ggplot(word_count_gender_marital, aes(x = reorder(word, n), y = n, fill
 ggsave(filename = "figs/plot_3.png", plot = fig_3)
 
 ```
+The third chart offers an intriguing look into how marital status affects word choice among men. Single men frequently use words like "watch," "play," and "friend," perhaps indicating a lifestyle centered around leisure and social activities. In contrast, married men use "wife" and "family" more often, suggesting a shift in focus towards domestic life after marriage. This could imply that single men find happiness in broader social circles and activities, while married men find it in a more focused, family-oriented setting.
 
 
 # 4. Top 5 Words by Gender and Marital Status (Percentage)
@@ -266,7 +281,14 @@ fig_4 = ggplot(word_count_gender_marital, aes(x = reorder(word, percentage), y =
 ggsave(filename = "figs/plot_4.png", plot = fig_4)
 
 ```
+The fourth chart, which presents the data in terms of percentages, provides a more nuanced understanding. While the word "friend" is used more frequently by men in both marital statuses, its proportion among all words remains around 2.5%. This could be due to the fact that single men are more active in sharing their social experiences, possibly on social media platforms, making the word "friend" appear more frequently in their vocabulary.
 
+Interestingly, single women use the word "family" more often than their married counterparts. This could signify the importance of family even before entering into a marital relationship. Married women, on the other hand, maintain a consistent frequency of the word "friend," suggesting that friendship plays a stable role throughout different life stages for women.
+
+# Final Thoughts
+The data story here paints a complex picture of how different groups express happiness. It's not just the frequency of words that matters, but also the context in which they are used. These insights could be valuable for marketers, psychologists, and social scientists interested in understanding human emotion and expression.
+
+By converting counts to percentages, we've managed to normalize the data, making the insights more robust and less susceptible to skewness due to sample size variations. Overall, the analysis provides a rich tapestry of how happiness is articulated across different segments of the population.
 
 ```{r}
 

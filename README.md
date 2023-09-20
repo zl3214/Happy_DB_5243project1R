@@ -28,11 +28,6 @@ Data Exploration
 The final part of the analysis delves into the relationship between marital status and the words used to express happiness. Four bar charts were created to display the top 5 words used by married and unmarried males and females.
 
 ### Insights
-Words like "love", "family", and "friends" are universally popular across genders and marital statuses.
-Unmarried individuals tend to use words like "free", "party", and "adventure" more frequently.
-Sentiment scores are generally positive, indicating that the dataset is indeed a collection of happy moments.
-Conclusion
-This analysis is more than just a data story; it's a glimpse into human emotion and the words we use to express it. Whether you're a data scientist, a linguist, or just someone interested in understanding happiness, this project offers a compelling narrative backed by data.
-
+In this Sentiment Analysis project on the HappyDB dataset, we explore how different groups express happiness through language. Our analysis reveals intriguing patterns: both genders frequently use words like "friend," "day," and "time," but diverge in other terms that reflect their focus—men on activities and women on family. Marital status also plays a role, especially among men, where single men focus on leisure and social activities, while married men shift towards family. The word "friend" remains consistently popular across all groups but varies in its proportion to total word usage. These insights offer a nuanced understanding of how happiness is articulated and could be valuable for various fields like marketing and psychology.
 # Feel free to dive into the code and explore the dataset yourself. Who knows, you might just find what makes you happy!
 
