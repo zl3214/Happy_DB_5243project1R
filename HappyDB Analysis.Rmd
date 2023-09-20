@@ -78,7 +78,7 @@ word_count <- bag_of_words %>%
 
 # visulize the result
 ```{r combining data, warning=FALSE, message=FALSE}
-# Filter top 10 most frequent words for each gender
+# Filter top 10 most frequent words
 top_words <- word_count %>%
   group_by(gender) %>%
   top_n(10, wt = n)
@@ -93,7 +93,7 @@ ggplot(top_words, aes(x = reorder(word, n), y = n, fill = gender)) +
   facet_wrap(~gender)
 
 
-# Create separate data frames for each gender
+# separate data frames
 male_words <- filter(top_words, gender == "m")
 female_words <- filter(top_words, gender == "f")
 
@@ -108,7 +108,9 @@ head(sentiments)
 ```
 
 
-### Sentiment Score by Gender
+# 1. Sentiment Score by Gender
+This bar chart aims to quantify the emotional tone behind the words used by different genders when expressing happiness.
+It provides a sentiment score for each gender, calculated using the bing lexicon, allowing us to see whether men or women express happiness in a more positive or negative manner.
 
 use the `bing` lexicon to calculate the sentiment score for each word and then aggregate them by gender.
 
@@ -130,15 +132,17 @@ ggplot(sentiment_score, aes(x = gender, y = sentiment_score, fill = gender)) +
        x = "Gender",
        y = "Sentiment Score")
 ```
-
-
+# 2. Network Graph of Bigrams
+# create network graph to directly show witch pair of words are 
+2. Network Graph of Bigrams
+The network graph is used to visualize the relationships between pairs of words (bigrams) that frequently appear together in the dataset.
+The graph helps to identify common phrases or combinations of words that people use to describe their happy moments, offering insights into the language of happiness.
 ```{r}
 
 library(igraph)
 library(ggraph)
 library(tidyr)  
 
-# Create bigrams
 bigrams <- hm_data %>%
   unnest_tokens(bigram, text, token = "ngrams", n = 2)
 
@@ -147,11 +151,10 @@ bigram_count <- bigrams %>%
   count(bigram, sort = TRUE) %>%
   head(100)
 
-# Remove rows where bigram is NA
+# clean
 bigram_count <- bigram_count %>%
   drop_na(bigram)
 
-# Create a network graph
 bigram_network <- bigram_count %>%
   separate(bigram, c("word1", "word2"), sep = " ", remove = FALSE) %>%
   drop_na(word1, word2) %>%
@@ -167,33 +170,32 @@ ggraph(bigram_network, layout = "fr") +
 
 
 ```{r}
-# 首先确保hm_data和bag_of_words都有一个共同的列（例如，'wid'）用于连接。
-# 然后执行内连接。
 combined_data <- inner_join(bag_of_words, hm_data, by = "wid")
 ```
 
 ```{r}
-# 查看combined_data的列
 colnames(combined_data)
 
 ```
 
+# 3.Top 5 Words by Gender and Marital Status (Frequency)
+This graph aims to identify the most frequently used words to express happiness, segmented by both gender and marital status.
+The graph displays the top 5 words for each group, allowing us to see if different life circumstances (like being married or single) influence the language used to express happiness.
 
 ```{r}
-# 重命名列以去除.x和.y后缀
+# rename
 combined_data <- combined_data %>%
   rename(
     gender = gender.x,
     marital = marital.x
   )
 
-# 现在，我们可以按性别和婚姻状况对单词进行计数。
 word_count_gender_marital <- combined_data %>%
   count(gender, marital, word, sort = TRUE) %>%
   group_by(gender, marital) %>%
   top_n(5, wt = n)
 
-# 可视化结果
+# Visulize the Result
 ggplot(word_count_gender_marital, aes(x = reorder(word, n), y = n, fill = marital)) +
   geom_col() +
   coord_flip() +
@@ -204,8 +206,12 @@ ggplot(word_count_gender_marital, aes(x = reorder(word, n), y = n, fill = marita
 
 
 ```
+
+# 4. Top 5 Words by Gender and Marital Status (Percentage)
+Similar to the previous graph, but this one uses percentages instead of raw counts to account for the imbalance in the number of responses from each group.
+The graph shows the top 5 words used to express happiness by each group, but normalized as a percentage of the total words used by that group. This provides a more balanced view across different genders and marital statuses.
 ```{r}
-# 现在，我们可以按性别和婚姻状况对单词进行计数。
+# Percentage
 word_count_gender_marital <- combined_data %>%
   count(gender, marital, word, sort = TRUE) %>%
   group_by(gender, marital) %>%
@@ -214,13 +220,15 @@ word_count_gender_marital <- combined_data %>%
   ungroup() %>%
   mutate(percentage = n / total * 100)
 
-# 可视化结果
+# Visualize the Result
 ggplot(word_count_gender_marital, aes(x = reorder(word, percentage), y = percentage, fill = marital)) +
   geom_col() +
   coord_flip() +
   labs(title = "Top 5 Words Used to Express Happiness by Gender and Marital Status",
        x = "Words",
        y = "Percentage (%)") +
+  facet_grid(marital ~ gender)
+
 ```
 
 
